@@ -16,7 +16,7 @@ export default function Dashboard() {
     const stats = [
         { label: 'Migration Streams', value: '12 Active', icon: <Zap className="w-4 h-4" />, color: 'text-primary', bg: 'bg-primary/10' },
         { label: 'System Throughput', value: '850 MB/s', icon: <Activity className="h-4 w-4" />, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
-        { label: 'Database Integrity', value: '100% Parity', icon: <ShieldCheck className="h-4 w-4" />, color: 'text-indigo-500', bg: 'bg-indigo-500/10' },
+        { label: 'Database Integrity', value: '100% Parity', icon: <ShieldCheck className="h-4 w-4" />, color: 'text-teal-500', bg: 'bg-teal-500/10' },
         { label: 'Active Infrastructure', value: '24 Nodes', icon: <Server className="h-4 w-4" />, color: 'text-amber-500', bg: 'bg-amber-500/10' },
     ];
 
@@ -138,7 +138,7 @@ export default function Dashboard() {
                         <div className="grid grid-cols-1 gap-4">
                             {[
                                 { title: 'Orchestrator', desc: 'Manage binary log sync', color: 'bg-primary' },
-                                { title: 'Validation', desc: 'Run integrity parity check', color: 'bg-indigo-500' },
+                                { title: 'Validation', desc: 'Run integrity parity check', color: 'bg-teal-500' },
                                 { title: 'Index Advisor', desc: 'Optimize query throughput', color: 'bg-emerald-500' },
                                 { title: 'System Docs', desc: 'Review node protocols', color: 'bg-slate-700' },
                             ].map((item, i) => (

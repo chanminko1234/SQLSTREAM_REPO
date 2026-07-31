@@ -302,6 +302,7 @@ class ConversionController extends Controller
         return response()->json([
             'success' => true,
             'data' => [
+                'tables' => $data['tables'] ?? [],
                 'schema_meta' => $data['tables'] ?? []
             ]
         ]);

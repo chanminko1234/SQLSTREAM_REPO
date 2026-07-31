@@ -68,31 +68,40 @@ export const SQLStreamer: React.FC<SQLStreamerProps> = ({
     eventSourceRef.current = es;
 
     es.addEventListener('meta', (event: any) => {
-      const data = JSON.parse(event.data);
-      setStatus('streaming');
-      toast.info('Connected to database engine.');
+      try {
+        const data = JSON.parse(event.data);
+        setStatus('streaming');
+        toast.info('Connected to database engine.');
+      } catch {
+        setStatus('streaming');
+      }
     });
 
     es.addEventListener('row', (event: any) => {
-      const row = JSON.parse(event.data);
+      try {
+        const row = JSON.parse(event.data);
+        if (row && typeof row === 'object') {
+          setRows((prev) => {
+            const next = [row, ...prev].slice(0, 500); // Keep last 500 for performance
+            if (prev.length === 0 && row) {
+              setColumns(Object.keys(row));
+            }
+            return next;
+          });
 
-      setRows((prev) => {
-        const next = [row, ...prev].slice(0, 500); // Keep last 500 for performance
-        if (prev.length === 0 && row) {
-          setColumns(Object.keys(row));
+          setStats((prev) => {
+            const total = prev.totalRows + 1;
+            const elapsed = (Date.now() - prev.startTime) / 1000;
+            return {
+              ...prev,
+              totalRows: total,
+              rowsPerSec: Math.round(total / (elapsed || 1))
+            };
+          });
         }
-        return next;
-      });
-
-      setStats((prev) => {
-        const total = prev.totalRows + 1;
-        const elapsed = (Date.now() - prev.startTime) / 1000;
-        return {
-          ...prev,
-          totalRows: total,
-          rowsPerSec: Math.round(total / (elapsed || 1))
-        };
-      });
+      } catch (e) {
+        console.error('Invalid row stream frame payload:', e);
+      }
     });
 
     es.addEventListener('done', (event: any) => {
@@ -108,10 +117,14 @@ export const SQLStreamer: React.FC<SQLStreamerProps> = ({
       es.close();
 
       try {
-        const error = JSON.parse(event.data);
-        toast.error(error.message || 'Streaming failed.');
+        if (event.data) {
+          const error = JSON.parse(event.data);
+          toast.error(error.message || 'Streaming failed.');
+        } else {
+          toast.error('Stream connection interrupted.');
+        }
       } catch {
-        toast.error('Lost connection to stream.');
+        toast.error('Stream connection ended with error status.');
       }
     });
   };
@@ -123,10 +136,23 @@ export const SQLStreamer: React.FC<SQLStreamerProps> = ({
     };
   }, []);
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+        e.preventDefault();
+        if (!isStreaming) {
+          startStream();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isStreaming, query]);
+
   return (
     <div className="space-y-6">
-      <Card className="border-primary/20 bg-background/50 backdrop-blur-xl">
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
+      <Card className="glass-card border-foreground/10 dark:border-white/5 rounded-[2rem] overflow-hidden shadow-2xl">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 border-b border-foreground/5 dark:border-white/5">
           <div className="flex items-center space-x-2">
             <Activity className="h-5 w-5 text-primary animate-pulse" />
             <CardTitle className="text-xl font-bold tracking-tight">SQL Live Streamer</CardTitle>
@@ -136,14 +162,44 @@ export const SQLStreamer: React.FC<SQLStreamerProps> = ({
               {status.toUpperCase()}
             </Badge>
             {isStreaming && (
-              <span className="flex h-3 w-3 rounded-full bg-green-500 animate-ping" />
+              <span className="flex h-3 w-3 rounded-full bg-emerald-500 animate-ping" />
             )}
           </div>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col space-y-4">
+          <div className="flex flex-col space-y-4 pt-4">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-black uppercase tracking-widest text-foreground/50">Presets:</span>
+                <button
+                  type="button"
+                  onClick={() => setQuery('SELECT id, name, email, created_at FROM users LIMIT 100')}
+                  className="px-2.5 py-1 text-[10px] font-black uppercase tracking-wider bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-lg hover:bg-emerald-500/20 transition-all border border-emerald-500/20"
+                >
+                  Users Stream
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setQuery('SELECT order_id, user_id, total_amount, status, created_at FROM orders ORDER BY created_at DESC LIMIT 50')}
+                  className="px-2.5 py-1 text-[10px] font-black uppercase tracking-wider bg-teal-500/10 text-teal-600 dark:text-teal-400 rounded-lg hover:bg-teal-500/20 transition-all border border-teal-500/20"
+                >
+                  Orders Analytics
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setQuery('SELECT id, user_id, action, ip_address, created_at FROM audit_logs LIMIT 100')}
+                  className="px-2.5 py-1 text-[10px] font-black uppercase tracking-wider bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded-lg hover:bg-amber-500/20 transition-all border border-amber-500/20"
+                >
+                  Audit Trail
+                </button>
+              </div>
+              <span className="text-[10px] font-bold text-foreground/40 hidden sm:inline-block">
+                Press <kbd className="px-1.5 py-0.5 bg-foreground/10 dark:bg-white/10 rounded text-[9px] font-mono">⌘/Ctrl + Enter</kbd> to stream
+              </span>
+            </div>
+
             <div className="relative group">
-              <div className="absolute -inset-1 bg-gradient-to-r from-primary/50 to-purple-500/50 rounded-lg blur opacity-25 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
+              <div className="absolute -inset-1 bg-gradient-to-r from-primary/50 to-teal-500/50 rounded-lg blur opacity-25 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
               <textarea
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
@@ -159,7 +215,7 @@ export const SQLStreamer: React.FC<SQLStreamerProps> = ({
                     onClick={startStream}
                     className="rounded-2xl flex justify-center items-center h-14 px-8 bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase text-[11px] tracking-widest active:scale-95 transition-all shadow-[0_15px_40px_rgba(var(--primary),0.3)] group"
                   >
-                    <Play className="w-4 h-4 mr-3 fill-current group-hover:scale-110 transition-transform" /> Start Protocol
+                    <Play className="w-4 h-4 mr-3 fill-current group-hover:scale-110 transition-transform" /> Start Protocol <span className="ml-2 text-[9px] opacity-60 font-normal">(⌘↵)</span>
                   </Button>
                 ) : (
                   <Button

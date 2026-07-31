@@ -28,10 +28,10 @@ export const CodeHighlighter: React.FC<CodeHighlighterProps> = ({
       className={`rounded-md ${className}`}
       customStyle={{
         margin: 0,
-        padding: '1rem',
+        padding: '1.25rem',
         fontSize: '0.875rem',
         fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace',
-        backgroundColor: 'hsl(var(--muted))',
+        backgroundColor: 'transparent',
       }}
       lineNumberStyle={{
         color: 'hsl(var(--muted-foreground))',

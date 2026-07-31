@@ -31,52 +31,52 @@
 
 @layer base {
   :root {
-    --background: 210 40% 98%;
-    --foreground: 222.2 84% 4.9%;
+    --background: 140 18% 97%;
+    --foreground: 155 50% 11%;
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 155 50% 11%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 262.1 83.3% 57.8%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 262.1 83.3% 57.8%;
+    --popover-foreground: 155 50% 11%;
+    --primary: 152 64% 33%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 142 25% 93%;
+    --secondary-foreground: 155 50% 12%;
+    --muted: 140 15% 95%;
+    --muted-foreground: 152 15% 42%;
+    --accent: 142 30% 90%;
+    --accent-foreground: 155 50% 11%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 140 18% 88%;
+    --input: 140 18% 88%;
+    --ring: 152 64% 33%;
     --radius: 0.75rem;
 
-    --brand: 262.1 83.3% 57.8%;
+    --brand: 152 64% 33%;
   }
 
   .dark {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 4.5%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 263.4 70% 50.4%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
+    --background: 155 35% 6%;
+    --foreground: 145 30% 94%;
+    --card: 155 30% 8.5%;
+    --card-foreground: 145 30% 95%;
+    --popover: 155 30% 8%;
+    --popover-foreground: 145 30% 95%;
+    --primary: 150 65% 44%;
+    --primary-foreground: 155 40% 6%;
+    --secondary: 155 25% 14%;
+    --secondary-foreground: 145 30% 94%;
+    --muted: 155 25% 13%;
+    --muted-foreground: 150 15% 62%;
+    --accent: 155 25% 16%;
+    --accent-foreground: 145 30% 94%;
+    --destructive: 0 62% 45%;
     --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 263.4 70% 50.4%;
+    --border: 155 25% 16%;
+    --input: 155 25% 16%;
+    --ring: 150 65% 44%;
 
-    --brand: 263.4 70% 50.4%;
+    --brand: 150 65% 44%;
   }
 }
 
@@ -93,22 +93,22 @@
 
 @layer components {
   .glass {
-    @apply bg-background/80 dark:bg-background/60 backdrop-blur-2xl border border-foreground/10 dark:border-foreground/5;
+    @apply bg-white/85 dark:bg-background/80 backdrop-blur-2xl border border-emerald-950/10 dark:border-emerald-500/10 shadow-sm;
   }
   
   .glass-card {
-    @apply bg-card/40 backdrop-blur-md border border-foreground/5 shadow-2xl;
+    @apply bg-white dark:bg-card/40 backdrop-blur-md border border-emerald-950/10 dark:border-emerald-500/10 shadow-lg shadow-emerald-950/5;
   }
 
   .text-glow {
-    text-shadow: 0 0 20px hsla(var(--brand), 0.3);
+    text-shadow: 0 0 24px hsla(var(--brand), 0.35);
   }
 
   .bg-grid {
     background-size: 40px 40px;
     background-image: 
-      linear-gradient(to right, hsla(var(--foreground), 0.03) 1px, transparent 1px),
-      linear-gradient(to bottom, hsla(var(--foreground), 0.03) 1px, transparent 1px);
+      linear-gradient(to right, hsla(var(--foreground), 0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, hsla(var(--foreground), 0.04) 1px, transparent 1px);
   }
 
   .bg-dot-grid {

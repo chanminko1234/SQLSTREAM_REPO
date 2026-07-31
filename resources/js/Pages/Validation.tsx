@@ -141,12 +141,12 @@ export default function Validation() {
 
                         <Card className="glass-card rounded-[3.5rem] p-10 border-foreground/5 dark:border-white/5 relative overflow-hidden group shadow-2xl">
                              <div className="absolute top-0 right-0 p-10 opacity-[0.02] group-hover:opacity-10 transition-opacity">
-                                <Zap className="h-24 w-24 text-indigo-500" />
+                                <Zap className="h-24 w-24 text-emerald-500" />
                             </div>
                             
                             <div className="flex items-center gap-4 mb-10">
-                                <div className="h-12 w-12 bg-indigo-500/10 rounded-2xl flex items-center justify-center border border-indigo-500/20 ring-1 ring-indigo-500/30">
-                                    <RefreshCcw className="h-6 w-6 text-indigo-400" />
+                                <div className="h-12 w-12 bg-emerald-500/10 rounded-2xl flex items-center justify-center border border-emerald-500/20 ring-1 ring-emerald-500/30">
+                                    <RefreshCcw className="h-6 w-6 text-emerald-400" />
                                 </div>
                                 <h3 className="text-2xl font-black uppercase tracking-tighter italic text-foreground leading-none">Target Node</h3>
                             </div>
@@ -156,7 +156,7 @@ export default function Validation() {
                                     <div className="space-y-3">
                                         <Label className="text-[10px] font-black uppercase tracking-widest text-foreground/40 dark:text-foreground/20 ml-2">Host</Label>
                                         <input
-                                            className="w-full bg-background dark:bg-white/[0.02] border border-foreground/10 dark:border-white/10 rounded-2xl px-6 py-4 text-[13px] font-black uppercase tracking-tight text-foreground focus:ring-2 ring-indigo-500 transition-all outline-none italic shadow-sm"
+                                            className="w-full bg-background dark:bg-white/[0.02] border border-foreground/10 dark:border-white/10 rounded-2xl px-6 py-4 text-[13px] font-black uppercase tracking-tight text-foreground focus:ring-2 ring-emerald-500 transition-all outline-none italic shadow-sm"
                                             value={targetConn.host}
                                             onChange={e => setTargetConn({ ...targetConn, host: e.target.value })}
                                         />
@@ -164,7 +164,7 @@ export default function Validation() {
                                     <div className="space-y-3">
                                         <Label className="text-[10px] font-black uppercase tracking-widest text-foreground/40 dark:text-foreground/20 ml-2">Port</Label>
                                         <input
-                                            className="w-full bg-background dark:bg-white/[0.02] border border-foreground/10 dark:border-white/10 rounded-2xl px-6 py-4 text-[13px] font-black uppercase tracking-tight text-foreground focus:ring-2 ring-indigo-500 transition-all outline-none italic shadow-sm"
+                                            className="w-full bg-background dark:bg-white/[0.02] border border-foreground/10 dark:border-white/10 rounded-2xl px-6 py-4 text-[13px] font-black uppercase tracking-tight text-foreground focus:ring-2 ring-emerald-500 transition-all outline-none italic shadow-sm"
                                             value={targetConn.port}
                                             onChange={e => setTargetConn({ ...targetConn, port: e.target.value })}
                                         />
@@ -173,7 +173,7 @@ export default function Validation() {
                                 <div className="space-y-3">
                                     <Label className="text-[10px] font-black uppercase tracking-widest text-foreground/40 dark:text-foreground/20 ml-2">Target Registry</Label>
                                     <input
-                                        className="w-full bg-background dark:bg-white/[0.02] border border-foreground/10 dark:border-white/10 rounded-2xl px-6 py-4 text-[13px] font-black uppercase tracking-tight text-foreground focus:ring-2 ring-indigo-500 transition-all outline-none italic shadow-sm placeholder:text-foreground/40 dark:placeholder:text-foreground/20"
+                                        className="w-full bg-background dark:bg-white/[0.02] border border-foreground/10 dark:border-white/10 rounded-2xl px-6 py-4 text-[13px] font-black uppercase tracking-tight text-foreground focus:ring-2 ring-emerald-500 transition-all outline-none italic shadow-sm placeholder:text-foreground/40 dark:placeholder:text-foreground/20"
                                         value={targetConn.db}
                                         onChange={e => setTargetConn({ ...targetConn, db: e.target.value })}
                                         placeholder="POSTGRES_DB"

@@ -3,44 +3,15 @@ import { Button } from '@/components/ui/button';
 import { useTheme } from '@/components/ThemeProvider';
 
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
-
-  const toggleTheme = () => {
-    if (theme === 'light') {
-      setTheme('dark');
-    } else if (theme === 'dark') {
-      setTheme('system');
-    } else {
-      setTheme('light');
-    }
-  };
-
-  const getIcon = () => {
-    if (theme === 'dark') {
-      return <Moon className="h-4 w-4" />;
-    }
-    return <Sun className="h-4 w-4" />;
-  };
-
-  const getLabel = () => {
-    if (theme === 'dark') {
-      return '';
-    } else if (theme === 'light') {
-      return '';
-    }
-    return '';
-  };
-
   return (
     <Button
       variant="outline"
       size="sm"
-      onClick={toggleTheme}
-      className="flex items-center"
-      title={`Current: ${getLabel()}. Click to toggle.`}
+      className="flex items-center gap-2 border-emerald-500/30 bg-emerald-500/10 text-emerald-400 font-bold text-[10px] uppercase tracking-wider rounded-xl cursor-default"
+      title="Nature Dark Mode Enforced"
     >
-      {getIcon()}
-      <span className="hidden sm:inline">{getLabel()}</span>
+      <Moon className="h-3.5 w-3.5 text-emerald-400" />
+      <span className="hidden sm:inline"></span>
     </Button>
   );
 }

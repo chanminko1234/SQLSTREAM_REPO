@@ -298,13 +298,30 @@ const Welcome: React.FC = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
           'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
         },
         body: JSON.stringify(payload)
       });
-      const result = await response.json();
-      if (!result.success) throw new Error(result.error);
-      setSchemaData(result.data.tables);
+      const responseText = await response.text();
+      if (response.redirected || responseText.includes('<!DOCTYPE html>') || responseText.includes('/login')) {
+        toast.error('Authentication Required', {
+          description: 'Please sign in to analyze schemas and run cluster migrations.'
+        });
+        window.location.href = '/login';
+        return;
+      }
+
+      let result;
+      try {
+        result = JSON.parse(responseText);
+      } catch {
+        throw new Error('Server returned invalid JSON format. Please verify your input query syntax.');
+      }
+      if (!result.success) throw new Error(result.error || 'Schema analysis failed');
+      const rawTables = result.data.tables || result.data.schema_meta || [];
+      const tablesArray = Array.isArray(rawTables) ? rawTables : Object.values(rawTables);
+      setSchemaData(tablesArray);
       setActiveTab('visualization');
       toast.success('Interactive ERD generated');
     } catch (err: any) {
@@ -339,12 +356,27 @@ const Welcome: React.FC = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
           'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
         },
         body: JSON.stringify(payload)
       });
-      const result = await response.json();
-      if (!result.success) throw new Error(result.error);
+      const responseText = await response.text();
+      if (response.redirected || responseText.includes('<!DOCTYPE html>') || responseText.includes('/login')) {
+        toast.error('Authentication Required', {
+          description: 'Session expired. Please sign in again to run transformations.'
+        });
+        window.location.href = '/login';
+        return;
+      }
+
+      let result;
+      try {
+        result = JSON.parse(responseText);
+      } catch {
+        throw new Error('Server returned invalid response syntax. Please check your SQL input.');
+      }
+      if (!result.success) throw new Error(result.error || 'Conversion failed');
       processResult(result);
       if (result.rollback) setRollbackScript(result.rollback);
       toast.success(mode === 'sql' ? `Converted to ${targetFormat.toUpperCase()}` : 'Live Migration Completed');
@@ -460,9 +492,9 @@ const Welcome: React.FC = () => {
       {/* Background Effects */}
       <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-full bg-grid opacity-[0.03] dark:opacity-[0.05]" />
-        <div className="absolute top-[-10%] left-[-10%] w-[70%] h-[70%] bg-primary/10 dark:bg-primary/20 blur-[130px] rounded-full animate-blob mix-blend-multiply dark:mix-blend-screen opacity-70 dark:opacity-100" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[70%] h-[70%] bg-indigo-500/10 dark:bg-indigo-500/15 blur-[130px] rounded-full animate-blob animation-delay-2000 mix-blend-multiply dark:mix-blend-screen opacity-70 dark:opacity-100" />
-        <div className="absolute top-[20%] left-[50%] w-[50%] h-[50%] bg-pink-500/5 dark:bg-pink-500/10 blur-[130px] rounded-full animate-blob animation-delay-4000 mix-blend-multiply dark:mix-blend-screen opacity-50 dark:opacity-100" />
+        <div className="absolute top-[-10%] left-[-10%] w-[70%] h-[70%] bg-primary/15 dark:bg-primary/25 blur-[130px] rounded-full animate-blob mix-blend-multiply dark:mix-blend-screen opacity-70 dark:opacity-100" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[70%] h-[70%] bg-emerald-500/10 dark:bg-emerald-500/15 blur-[130px] rounded-full animate-blob animation-delay-2000 mix-blend-multiply dark:mix-blend-screen opacity-70 dark:opacity-100" />
+        <div className="absolute top-[20%] left-[50%] w-[50%] h-[50%] bg-teal-500/10 dark:bg-teal-500/15 blur-[130px] rounded-full animate-blob animation-delay-4000 mix-blend-multiply dark:mix-blend-screen opacity-50 dark:opacity-100" />
       </div>
 
       <nav className="border-b glass fixed top-0 w-full z-50 px-8 py-5 flex items-center justify-between backdrop-blur-3xl shadow-2xl shadow-black/10">
@@ -655,12 +687,12 @@ const Welcome: React.FC = () => {
           </p>
 
           <div className="flex items-center justify-center gap-4 pt-8">
-            <div className="bg-foreground/[0.03] dark:bg-slate-900/50 p-1.5 rounded-[1.5rem] border border-foreground/10 dark:border-white/10 flex gap-2 backdrop-blur-xl shadow-inner shadow-black/5 dark:shadow-black/20">
+            <div className="bg-white/80 dark:bg-slate-900/60 p-1.5 rounded-[1.5rem] border border-emerald-950/10 dark:border-white/10 flex gap-2 backdrop-blur-xl shadow-md">
               <Button
                 variant={mode === 'sql' ? 'default' : 'ghost'}
                 size="sm"
                 onClick={() => setMode('sql')}
-                className="rounded-xl flex px-6 font-bold text-[10px] uppercase tracking-widest shadow-none"
+                className={`rounded-xl flex px-6 font-bold text-[10px] uppercase tracking-widest ${mode === 'sql' ? 'bg-primary text-primary-foreground shadow-md' : 'text-foreground/70 dark:text-white/70 hover:text-foreground'}`}
               >
                 <Terminal className="w-3 h-3 mr-2" />
                 SQL Dump
@@ -669,7 +701,7 @@ const Welcome: React.FC = () => {
                 variant={mode === 'stream' ? 'default' : 'ghost'}
                 size="sm"
                 onClick={() => setMode('stream')}
-                className="rounded-xl flex px-6 font-bold text-[10px] uppercase tracking-widest shadow-none"
+                className={`rounded-xl flex px-6 font-bold text-[10px] uppercase tracking-widest ${mode === 'stream' ? 'bg-primary text-primary-foreground shadow-md' : 'text-foreground/70 dark:text-white/70 hover:text-foreground'}`}
               >
                 <Server className="w-3 h-3 mr-2" />
                 Live Stream
@@ -678,7 +710,7 @@ const Welcome: React.FC = () => {
                 variant={mode === 'tuning' ? 'default' : 'ghost'}
                 size="sm"
                 onClick={() => setMode('tuning')}
-                className="rounded-xl flex px-6 font-bold text-[10px] uppercase tracking-widest shadow-none"
+                className={`rounded-xl flex px-6 font-bold text-[10px] uppercase tracking-widest ${mode === 'tuning' ? 'bg-primary text-primary-foreground shadow-md' : 'text-foreground/70 dark:text-white/70 hover:text-foreground'}`}
               >
                 <Activity className="w-3 h-3 mr-2" />
                 Tuning Advisor
@@ -883,7 +915,7 @@ const Welcome: React.FC = () => {
                 variant="outline"
                 onClick={handleAnalyze}
                 disabled={isAnalyzing || isConverting || (mode === 'sql' && !mysqlInput.trim()) || (mode === 'stream' && !sourceConn.db)}
-                className="rounded-2xl flex px-8 border-primary/20 hover:bg-primary/5 text-primary font-bold shadow-xl transition-all active:scale-95"
+                className="rounded-2xl flex px-8 border-2 border-emerald-600/30 bg-white dark:bg-slate-900 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 font-bold shadow-md transition-all active:scale-95"
               >
                 {isAnalyzing ? <Activity className="mr-2 h-4 w-4 animate-spin" /> : <Search className="mr-2 w-4" />}
                 Analyze Schema
@@ -893,7 +925,7 @@ const Welcome: React.FC = () => {
                 size="lg"
                 onClick={handleConvert}
                 disabled={isConverting || (mode === 'sql' && !mysqlInput.trim()) || (mode === 'stream' && (!sourceConn.db || !targetConn.db))}
-                className={`rounded-2xl px-10 flex shadow-2xl font-bold transition-all active:scale-95 ${mode === 'stream' ? 'bg-amber-500 hover:bg-amber-600 shadow-amber-500/40' : 'bg-primary hover:bg-primary/90 shadow-primary/40'
+                className={`rounded-2xl px-10 flex shadow-xl font-bold transition-all active:scale-95 ${mode === 'stream' ? 'bg-amber-500 hover:bg-amber-600 shadow-amber-500/40 text-white' : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/20'
                   }`}
               >
                 {isConverting ? <Activity className="animate-spin h-5 w-5 mr-2" /> : !auth.user ? <ShieldCheck className="w-5 mr-2 opacity-50" /> : mode === 'stream' ? <Server className="w-5 mr-2" /> : <Rocket className="w-5 mr-2" />}
@@ -937,7 +969,76 @@ const Welcome: React.FC = () => {
                   <div className="h-3 w-3 rounded-full bg-emerald-500/50" />
                 </div>
                 {mode === 'sql' && (
-                  <div className="flex gap-4 items-center">
+                  <div className="flex flex-wrap gap-3 items-center">
+                    <div className="flex items-center gap-1.5 bg-foreground/5 dark:bg-white/5 px-2 py-1 rounded-xl border border-foreground/10 dark:border-white/10">
+                      <span className="text-[9px] font-black uppercase tracking-wider text-foreground/40 dark:text-white/40 mr-1">Presets:</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setInputMethod('manual');
+                          setMysqlInput(`CREATE TABLE users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  email VARCHAR(255) UNIQUE NOT NULL,
+  is_active TINYINT(1) DEFAULT 1,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE orders (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  total_amount DECIMAL(10,2) NOT NULL,
+  status ENUM('pending', 'completed', 'failed') DEFAULT 'pending',
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);`);
+                        }}
+                        className="px-2 py-0.5 text-[9px] font-black uppercase tracking-wider bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-md hover:bg-emerald-500/20 transition-all border border-emerald-500/20"
+                      >
+                        E-Commerce
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setInputMethod('manual');
+                          setMysqlInput(`CREATE TABLE tenants (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  company_name VARCHAR(255) NOT NULL,
+  settings JSON,
+  is_enterprise TINYINT(1) DEFAULT 0,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE subscriptions (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  tenant_id INT NOT NULL,
+  plan_code VARCHAR(50) NOT NULL,
+  expires_at DATETIME NOT NULL,
+  FOREIGN KEY (tenant_id) REFERENCES tenants(id)
+);`);
+                        }}
+                        className="px-2 py-0.5 text-[9px] font-black uppercase tracking-wider bg-teal-500/10 text-teal-600 dark:text-teal-400 rounded-md hover:bg-teal-500/20 transition-all border border-teal-500/20"
+                      >
+                        SaaS Multi-Tenant
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setInputMethod('manual');
+                          setMysqlInput(`CREATE TABLE events (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  event_name VARCHAR(100) NOT NULL,
+  payload JSON,
+  ip_address VARCHAR(45),
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);`);
+                        }}
+                        className="px-2 py-0.5 text-[9px] font-black uppercase tracking-wider bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded-md hover:bg-amber-500/20 transition-all border border-amber-500/20"
+                      >
+                        Analytics
+                      </button>
+                    </div>
+
                     <div className="bg-foreground/5 dark:bg-white/5 p-1 rounded-xl flex gap-1 border border-foreground/5 dark:border-white/5 ring-1 ring-foreground/10 dark:ring-white/10">
                       <Button
                         variant={inputMethod === 'manual' ? 'default' : 'ghost'}
@@ -977,7 +1078,7 @@ const Welcome: React.FC = () => {
               </div>
 
               {/* Context Switch */}
-              <div className="flex-1 overflow-auto bg-foreground/[0.02] dark:bg-slate-950/20 backdrop-blur-3xl">
+              <div className="flex-1 overflow-auto bg-slate-50/60 dark:bg-slate-950/30 backdrop-blur-3xl">
                 {mode === 'sql' && inputMethod === 'manual' ? (
                   <>
                     <AnimatePresence>
@@ -1004,7 +1105,7 @@ const Welcome: React.FC = () => {
                       value={mysqlInput}
                       onChange={(e) => setMysqlInput(e.target.value)}
                       placeholder="-- Paste MySQL here..."
-                      className="min-h-[500px] p-8 bg-transparent border-none focus-visible:ring-0 font-mono text-base resize-none leading-relaxed placeholder:text-foreground/20"
+                      className="min-h-[500px] p-8 bg-transparent border-none focus-visible:ring-0 font-mono text-base resize-none leading-relaxed text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-600"
                     />
                   </>
                 ) : mode === 'sql' && inputMethod === 'live' ? (
@@ -1294,11 +1395,11 @@ const Welcome: React.FC = () => {
                       <TabsTrigger value="rollback" className="rounded-full px-5 py-1.5 text-[10px] font-bold uppercase tracking-widest data-[state=active]:bg-red-500 flex items-center gap-2">
                         <Eraser className="h-3 w-3" /> Rollback
                       </TabsTrigger>
-                      <TabsTrigger value="visualization" className="rounded-full px-5 py-1.5 text-[10px] font-bold uppercase tracking-widest data-[state=active]:bg-indigo-500 flex items-center gap-2">
+                      <TabsTrigger value="visualization" className="rounded-full px-5 py-1.5 text-[10px] font-bold uppercase tracking-widest data-[state=active]:bg-emerald-600 flex items-center gap-2">
                         <Database className="h-3 w-3" /> ERD
                       </TabsTrigger>
                       {schemaData && (
-                        <TabsTrigger value="mapper" className="rounded-full px-5 py-1.5 text-[10px] font-bold uppercase tracking-widest data-[state=active]:bg-violet-600 flex items-center gap-2">
+                        <TabsTrigger value="mapper" className="rounded-full px-5 py-1.5 text-[10px] font-bold uppercase tracking-widest data-[state=active]:bg-teal-600 flex items-center gap-2">
                           <Zap className="h-3 w-3" /> Mapper
                         </TabsTrigger>
                       )}
@@ -1427,9 +1528,9 @@ const Welcome: React.FC = () => {
                               )}
                             </AnimatePresence>
 
-                            <div className="relative group/code rounded-[2.5rem] overflow-hidden border border-white/5 shadow-2xl">
-                              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/50 via-primary to-primary/50 opacity-20" />
-                              <div className="max-h-[400px] overflow-auto custom-scrollbar bg-background/60 dark:bg-slate-950/40 backdrop-blur-md">
+                            <div className="relative group/code rounded-[2.5rem] overflow-hidden border border-emerald-950/10 dark:border-white/10 shadow-lg">
+                              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500/50 via-emerald-600 to-emerald-500/50 opacity-30" />
+                              <div className="max-h-[400px] overflow-auto custom-scrollbar bg-slate-50/70 dark:bg-slate-950/40 backdrop-blur-md">
                                 <CodeHighlighter code={output || '-- Awaiting Execution Data...'} language={targetFormat === 'csv' ? 'text' : 'sql'} />
                               </div>
 
@@ -1730,7 +1831,7 @@ const Welcome: React.FC = () => {
               <ERDVisualizer tables={schemaData} />
               <div className="absolute top-12 left-12 pointer-events-none space-y-4">
                 <div className="flex items-center gap-6">
-                  <div className="bg-indigo-600 p-4 rounded-[2rem] shadow-2xl shadow-indigo-600/40">
+                  <div className="bg-emerald-600 p-4 rounded-[2rem] shadow-2xl shadow-emerald-600/40">
                     <Database className="h-5 w-5 text-white" />
                   </div>
                   <div className="space-y-1">
@@ -1753,7 +1854,7 @@ const Welcome: React.FC = () => {
               <MigrationMapper schema={schemaData} />
               <div className="absolute top-12 left-12 pointer-events-none space-y-4">
                 <div className="flex items-center gap-6">
-                  <div className="bg-violet-600 p-4 rounded-[2rem] shadow-2xl shadow-violet-600/40">
+                  <div className="bg-teal-600 p-4 rounded-[2rem] shadow-2xl shadow-teal-600/40">
                     <Zap className="h-5 w-5 text-white" />
                   </div>
                   <div className="space-y-1">

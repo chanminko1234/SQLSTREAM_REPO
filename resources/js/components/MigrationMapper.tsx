@@ -223,7 +223,13 @@ const MapperContent = ({ schema }: { schema: any }) => {
               <p className="text-[9px] opacity-40 font-bold uppercase tracking-tighter italic">Live Bridge Active</p>
             </div>
             <div className="h-8 w-[1px] bg-white/10" />
-            <div className="flex gap-2">
+            <div className="flex items-center gap-2">
+                <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-white/5 rounded-xl border border-white/10 text-[9px] font-mono text-white/70">
+                  <span className="text-emerald-400 font-bold">TINYINT(1)</span> → <span className="text-teal-300">BOOL</span>
+                </div>
+                <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-white/5 rounded-xl border border-white/10 text-[9px] font-mono text-white/70">
+                  <span className="text-emerald-400 font-bold">DATETIME</span> → <span className="text-teal-300">TIMESTAMPTZ</span>
+                </div>
                 <Button 
                     variant="ghost" 
                     size="icon" 

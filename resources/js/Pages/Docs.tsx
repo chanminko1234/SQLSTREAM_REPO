@@ -62,7 +62,7 @@ export default function Docs() {
         {
             id: 'ai-index-advisor',
             title: 'Neural Engine',
-            icon: <Cpu className="h-5 w-5 text-purple-400" />,
+            icon: <Cpu className="h-5 w-5 text-emerald-400" />,
             content: (
                 <div className="space-y-6">
                     <p className="text-foreground/50 dark:text-foreground/40 font-bold leading-relaxed tracking-tight">Leverage Google Gemini to optimize your target PostgreSQL architecture. NTE scans your source schema and suggests indexing strategies.</p>

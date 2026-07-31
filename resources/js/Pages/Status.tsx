@@ -128,7 +128,7 @@ export default function Status() {
                 </section>
 
                 {/* Community Portal Footer */}
-                <footer className="p-1.5 bg-gradient-to-r from-primary/10 via-indigo-500/10 to-primary/10 dark:from-primary/20 dark:via-indigo-500/20 dark:to-primary/20 rounded-[4rem] shadow-2xl relative">
+                <footer className="p-1.5 bg-gradient-to-r from-primary/10 via-emerald-500/15 to-primary/10 dark:from-primary/20 dark:via-emerald-500/25 dark:to-primary/20 rounded-[4rem] shadow-2xl relative">
                     <div className="p-14 rounded-[3.8rem] bg-background/80 dark:bg-background/60 backdrop-blur-3xl flex flex-col md:flex-row items-center justify-between gap-12 border border-foreground/10 dark:border-white/5 overflow-hidden">
                         <div className="absolute top-0 right-0 p-12 opacity-[0.03] pointer-events-none group-hover:rotate-12 transition-transform">
                             <Globe className="w-64 h-64 text-primary" />

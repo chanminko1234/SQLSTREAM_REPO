@@ -82,7 +82,7 @@ export default function Support() {
                 {/* Support Platforms Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {[
-                        { icon: <MessageCircle />, title: 'Dev Cluster', desc: 'Join the founding node of engineers directly in our Discord.', action: 'Join Discord', color: 'text-indigo-500', url: 'https://discord.gg/qwsG7jYw' },
+                        { icon: <MessageCircle />, title: 'Dev Cluster', desc: 'Join the founding node of engineers directly in our Discord.', action: 'Join Discord', color: 'text-emerald-500', url: 'https://discord.gg/qwsG7jYw' },
                         { icon: <Github />, title: 'Core Issues', desc: 'Contribute to the transpiler logic and report structural bugs.', action: 'Open Tracker', color: 'text-foreground/60', url: 'https://github.com/chanminko1234/converter/issues' },
                         { icon: <Shield />, title: 'Architecture SLA', desc: 'Deep-tier architectural guidance for mission-critical enterprise nodes.', action: 'Consult Architects', color: 'text-primary', url: 'https://discord.gg/qwsG7jYw' },
                     ].map((item, i) => (

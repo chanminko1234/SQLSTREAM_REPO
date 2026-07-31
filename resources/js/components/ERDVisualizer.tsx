@@ -49,7 +49,7 @@ const TableNode = ({ data, selected }: any) => {
         className={`bg-[#1e1e2e] border-2 rounded-xl overflow-hidden font-sans relative group/node transition-colors z-20 shadow-2xl`}
       >
         {selected && (
-            <div className="absolute inset-0 bg-indigo-500/5 animate-pulse pointer-events-none" />
+            <div className="absolute inset-0 bg-emerald-500/10 animate-pulse pointer-events-none" />
         )}
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white-[0.02] to-transparent -translate-x-full group-hover/node:animate-[shimmer_3s_infinite] pointer-events-none" />
         
@@ -63,14 +63,20 @@ const TableNode = ({ data, selected }: any) => {
 
         {/* COLUMNS */}
         <div className="py-2 bg-[#181926]">
-          {data.columns.map((col: any) => {
-            const isPK = col.name.toLowerCase() === 'id' || col.original_type.toLowerCase().includes('primary key');
-            const isFK = data.foreign_keys?.some((fk: any) => fk.column === col.name);
+          {(data.columns || []).map((col: any, idx: number) => {
+            if (!col || typeof col !== 'object') return null;
+            const colName = col.name || col.column_name || `col_${idx}`;
+            const origType = String(col.original_type || col.type || col.data_type || '');
+            const colType = String(col.converted_type || col.type || col.data_type || col.original_type || 'VARCHAR');
+            const typeDisplay = colType.split(' ')[0];
+
+            const isPK = Boolean(col.is_pk || col.primary_key || colName.toLowerCase() === 'id' || origType.toLowerCase().includes('primary key'));
+            const isFK = Boolean(col.is_fk || data.foreign_keys?.some((fk: any) => fk.column === colName));
             const piiTag = col.pii_tag;
-            const colId = colIdMatch(col.name);
+            const colId = colIdMatch(colName);
 
             return (
-              <div key={col.name} className={`group relative flex items-center justify-between px-4 py-2 hover:bg-white/5 transition-colors ${piiTag ? 'bg-amber-500/5 border-l-2 border-amber-500/40' : ''}`}>
+              <div key={colName + '_' + idx} className={`group relative flex items-center justify-between px-4 py-2 hover:bg-white/5 transition-colors ${piiTag ? 'bg-amber-500/5 border-l-2 border-amber-500/40' : ''}`}>
                 {/* HANDLES MOVED TO ROOT WRAPPER FOR STABILITY */}
                 <div className="absolute inset-x-0 h-full pointer-events-none">
                     <Handle 
@@ -100,13 +106,13 @@ const TableNode = ({ data, selected }: any) => {
                       )}
                   </div>
                   <span className="text-[13px] font-medium text-white/80 group-hover:text-white transition-colors truncate">
-                      {col.name}
+                      {colName}
                   </span>
                 </div>
 
                 <div className="flex items-center gap-2 shrink-0 ml-4">
                   <span className="text-[10px] font-mono text-white/40 uppercase tracking-tighter">
-                      {col.converted_type.split(' ')[0]}
+                      {typeDisplay}
                   </span>
                   {isPK && <span className="text-[8px] font-black bg-white/5 text-white/30 px-1 rounded">PK</span>}
                   {piiTag && (
@@ -128,7 +134,7 @@ const nodeTypes = {
   table: TableNode,
 };
 
-const ERDContent = ({ tables }: { tables: any[] }) => {
+const ERDContent = ({ tables }: { tables: any }) => {
   const { fitView } = useReactFlow();
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -137,24 +143,40 @@ const ERDContent = ({ tables }: { tables: any[] }) => {
     const initialNodes: Node[] = [];
     const initialEdges: Edge[] = [];
 
-    tables.forEach((table, i) => {
-      const tableId = table.name.toLowerCase();
+    const tableList: any[] = Array.isArray(tables)
+      ? tables
+      : (tables && typeof tables === 'object' ? Object.values(tables) : []);
+
+    tableList.forEach((table, i) => {
+      if (!table || typeof table !== 'object') return;
+
+      const rawName = table.name || table.table_name || `table_${i}`;
+      const tableId = String(rawName).toLowerCase();
       const x = (i % 3) * 450;
       const y = Math.floor(i / 3) * 600;
+
+      const columns = Array.isArray(table.columns)
+        ? table.columns
+        : (table.columns && typeof table.columns === 'object' ? Object.values(table.columns) : []);
+
+      const foreignKeys = Array.isArray(table.foreign_keys)
+        ? table.foreign_keys
+        : (table.foreign_keys && typeof table.foreign_keys === 'object' ? Object.values(table.foreign_keys) : []);
 
       initialNodes.push({
         id: tableId,
         type: 'table',
         position: { x, y },
-        data: { name: table.name, columns: table.columns, foreign_keys: table.foreign_keys },
+        data: { name: rawName, columns, foreign_keys: foreignKeys },
       });
 
-      if (table.foreign_keys) {
-        table.foreign_keys.forEach((fk: any, j: number) => {
-          const sourceTableId = fk.references_table.toLowerCase();
+      if (foreignKeys.length > 0) {
+        foreignKeys.forEach((fk: any, j: number) => {
+          if (!fk || !fk.references_table || !fk.column) return;
+          const sourceTableId = String(fk.references_table).toLowerCase();
           const targetTableId = tableId;
-          const sourceCol = fk.references_column.toLowerCase();
-          const targetCol = fk.column.toLowerCase();
+          const sourceCol = String(fk.references_column || 'id').toLowerCase();
+          const targetCol = String(fk.column).toLowerCase();
 
           initialEdges.push({
             id: `e-${targetTableId}-${sourceTableId}-${j}`,
@@ -197,8 +219,8 @@ const ERDContent = ({ tables }: { tables: any[] }) => {
           transition={{ duration: 10, repeat: Infinity, repeatType: "mirror", ease: "linear" }}
           className="absolute inset-[-50px] bg-dot-grid opacity-[0.05] scale-110" 
         />
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-500/10 blur-[120px] rounded-full animate-blob overflow-hidden" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-500/10 blur-[120px] rounded-full animate-blob animation-delay-2000 overflow-hidden" />
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-500/15 blur-[120px] rounded-full animate-blob overflow-hidden" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-teal-500/15 blur-[120px] rounded-full animate-blob animation-delay-2000 overflow-hidden" />
       </div>
 
       <ReactFlow

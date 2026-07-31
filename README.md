@@ -1,26 +1,25 @@
 # SQLStream 🚀
-> Real-time SQL result streaming for Laravel via SSE.
+> Real-Time MySQL to PostgreSQL Transpiler & High-Performance Migration Orchestrator.
 
 [![Laravel 12](https://img.shields.io/badge/Laravel-12.x-FF2D20?style=for-the-badge&logo=laravel)](https://laravel.com)
 [![React 19](https://img.shields.io/badge/React-19.x-61DAFB?style=for-the-badge&logo=react)](https://react.dev)
 [![Tailwind CSS 4](https://img.shields.io/badge/Tailwind_CSS-4.0-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com)
+[![Theme: Nature Dark](https://img.shields.io/badge/Theme-Nature_Dark-10b981?style=for-the-badge)](https://github.com/chanminko1234/SQLSTREAM_REPO)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
 
 ![Protocol Launch Demo](docs/images/dashboard_demo.webp)
 
-**SQLStream** is a high-performance SQL result streaming platform that utilizes **Server-Sent Events (SSE)** to deliver real-time data from diverse database engines directly to a premium, glass-morphic frontend. 
+**SQLStream** is a high-performance database migration platform that combines real-time **Server-Sent Events (SSE)** result streaming, AST-based MySQL to PostgreSQL translation, automated ORM schema generation, interactive ERD modeling, and zero-downtime cutover orchestration inside a premium **Lush Emerald Nature Dark** UI.
 
 ---
 
 ## 📸 System Showcase
-
 
 | Landing Page | Interactive Dashboard |
 | :---: | :---: |
 | ![Landing](docs/images/landing.png) | ![Dashboard](docs/images/dashboard.png) |
 
 | Infrastructure Health | Engineering Documentation |
-| Engineering Landing Ecosystem | Node Control Center |
 | :---: | :---: |
 | ![Status](docs/images/status.png) | ![Docs](docs/images/hero.png) |
 
@@ -28,33 +27,51 @@
 
 ## ✨ Key Features
 
-- ⚡ **Real-Time SSE Streaming**: Instant data delivery using high-performance PHP Generators and DB Cursors.
-- 🌳 **Multi-Database Strategy**: Native support for **Postgres, MySQL, SQLite, Oracle, and SQL Server**.
-- 📊 **Interactive Telemetry**: High-fidelity data table with spring-animations and CSV/Clipboard export.
-- 🌫️ **Engineering Node UI**: A mission-critical, glass-morphic design built with Tailwind CSS 4.
-- 🛡️ **Hardened Security**: Built-in SSRF protection and strict Read-Only SQL enforcement.
-- 🔐 **SSO Ready**: Seamless identity federation via GitHub and Google.
+- 🌿 **Enforced Nature Dark Mode**: High-contrast Lush Emerald, Soft Sage, and Pine Obsidian Dark Mode styling built with glassmorphism and subtle micro-animations.
+- ⚡ **Real-Time SSE Streaming**: Instant schema and data streaming powered by Server-Sent Events, PHP Generators, and database cursors.
+- 🔄 **Reversible Migrations & Rollback Scripting**:
+  - Auto-generated **`down.sql`** transactional rollback scripts.
+  - Native **Laravel Migration (PHP)** class generation with `up()` & `down()` schema definitions.
+- 🛠️ **Multi-Format Code & ORM Exporters**:
+  - **Prisma Schema (`schema.prisma`)**: Model definitions with `@id`, autoincrement, and column mapping (`@@map`).
+  - **Drizzle ORM (`schema.ts`)**: Type-safe `drizzle-orm/pg-core` table schemas (`serial`, `text`, `integer`, `timestamp`, `json`).
+  - **Production Docker Stack (`docker-compose.yml`)**: Ready-to-run PostgreSQL 16 + pgAdmin4 container infrastructure.
+- 📊 **Resilient Interactive ERD & Column Mapper**:
+  - Powered by ReactFlow with automatic column normalization, foreign key routing, and PII sensitivity badges.
+- 💡 **AI-Driven Index Advisor & PG Architect**:
+  - Automatic index recommendations and tailored `postgresql.conf` tuning based on target server RAM and CPU core specs.
+- 🛡️ **Hardened Security & SSRF Protection**:
+  - Strict host validation, read-only SQL validation sandbox, and identity federation via GitHub and Google SSO.
 
 ---
 
-## 🏗️ Project Structure
+## 🏗️ Project Architecture
 
 ```bash
 ├── app/
 │   ├── Http/Controllers/
-│   │   └── SseController.php        # Core SSE Protocol Handler
+│   │   ├── ConversionController.php   # MySQL to Postgres DDL & AST Converter
+│   │   ├── SseController.php          # Real-Time SSE Streaming Handler
+│   │   ├── IndexAdvisorController.php # AI-driven Index Recommendations
+│   │   └── OrchestrationController.php# CDC Pipeline & Cutover Manager
 │   ├── Services/
-│   │   ├── DatabaseAdapters/       # Strategy Pattern Adapters (MySQL, Postgres, etc.)
-│   │   └── SQL/
-│   │       └── QueryStreamerService.php # Generator-based Streaming Logic
-│   └── Traits/
-│       └── ValidatesDatabaseHost.php # SSRF Security Layer
+│   │   ├── DatabaseAdapters/          # Adapter Strategy (MySQL, Postgres, SQLite, Oracle)
+│   │   ├── SQL/
+│   │   │   └── SQLParserService.php   # AST Parser & Transpiler Rules
+│   │   └── AuditLogger.php            # Security & Compliance Audit Trail
 ├── resources/js/
-│   ├── Components/
-│   │   ├── SQLStreamer.tsx        # Live Terminal Component
-│   │   └── StreamingDataTable.tsx # High-performance Data Grid
-│   └── Pages/                      # Inertia.js Dashboard & Status Nodes
-└── routes/web.php                  # Protocol Route Definitions
+│   ├── components/
+│   │   ├── ERDVisualizer.tsx          # ReactFlow ERD Node Visualizer
+│   │   ├── DiffExplorer.tsx           # Multi-Format Code & ORM Exporter
+│   │   ├── MigrationMapper.tsx        # Type Conversion Rule Badges
+│   │   ├── SQLStreamer.tsx            # Live Stream Terminal Component
+│   │   └── ThemeToggle.tsx            # Nature Dark Mode Indicator
+│   └── Pages/
+│       ├── Welcome.tsx                # Main Converter Engine & Playground
+│       ├── Dashboard.tsx              # Infrastructure Control Center
+│       ├── Validation.tsx             # Data Integrity Parity Check
+│       └── Orchestrator.tsx           # Zero-Downtime Migration Manager
+└── routes/web.php                     # Protocol API & Stream Routes
 ```
 
 ---
@@ -66,9 +83,9 @@ Establish your mission-critical SQLStream node with the following engineering pr
 ### 📋 Prerequisites
 
 Before initialization, ensure your infrastructure meets the following specifications:
-- **PHP**: ^8.2 (with JSON and PDO extensions)
+- **PHP**: ^8.2 (with JSON, PDO, and OpenSSL extensions)
 - **Node.js**: ^20.x (LTS recommended)
-- **Database**: PostgreSQL (Sink), MySQL/Oracle/Sqlite (Source nodes)
+- **Database**: PostgreSQL 15+ (Sink), MySQL 5.7+/8.0+ (Source)
 - **Composer**: ^2.6
 
 ### 🛠️ Installation Protocol
@@ -76,7 +93,7 @@ Before initialization, ensure your infrastructure meets the following specificat
 1. **Clone the Repository**
    ```bash
    git clone https://github.com/chanminko1234/SQLSTREAM_REPO.git
-   cd SQLSTREAM_REPO
+   cd converter
    ```
 
 2. **Initialize Backend Environment**
@@ -86,8 +103,8 @@ Before initialization, ensure your infrastructure meets the following specificat
    php artisan key:generate
    ```
 
-3. **Configure the Matrix (`.env`)**
-   Update your database credentials to enable local streaming. Ensure your `DB_CONNECTION` is set to your target PostgreSQL engine.
+3. **Configure Database & Environment (`.env`)**
+   Update your database credentials to connect to your target PostgreSQL engine.
    ```env
    DB_CONNECTION=pgsql
    DB_HOST=127.0.0.1
@@ -97,7 +114,7 @@ Before initialization, ensure your infrastructure meets the following specificat
    DB_PASSWORD=your_password
    ```
 
-4. **Prepare the Data Fabric**
+4. **Run Migrations & Seed Database**
    ```bash
    php artisan migrate --seed
    ```
@@ -105,38 +122,34 @@ Before initialization, ensure your infrastructure meets the following specificat
 5. **Deploy Frontend Build**
    ```bash
    npm install
-   npm run dev
+   npm run build
    ```
 
-6. **Engage Node**
-   Launch your local development server:
+6. **Start Development Servers**
    ```bash
+   # Terminal 1: Laravel Backend
    php artisan serve
+
+   # Terminal 2: Vite Dev Server (optional)
+   npm run dev
    ```
-   Accessible at: `http://localhost:8000`
+   Access application at: `http://localhost:8000`
 
 ---
 
 ## 🧠 Technical Insight: Why SSE?
 
-SQLStream utilizes **Server-Sent Events (SSE)** for all real-time data telemetry. While WebSockets are excellent for bi-directional communication (like chat), SSE is the superior architectural choice for unidirectional SQL result streaming.
+SQLStream utilizes **Server-Sent Events (SSE)** for real-time streaming:
 
-### ⚖️ SSE vs. WebSockets
-1. **Lightweight Protocol**: SSE operates over standard HTTP. It doesn't require the complex handshake or custom server logic that WebSockets demand, reducing server overhead.
-2. **Automatic Reconnection**: Browsers natively handle reconnections for SSE. If the network drops, the `EventSource` automatically attempts to re-establish the stream without custom JavaScript logic.
-3. **Firewall Friendly**: Since SSE is just standard HTTP/2, it sidesteps many of the corporate firewall and proxy issues that often block WebSocket traffic.
-
-### 🛠️ Laravel Backend Orchestration
-The Laravel backend utilizes a mission-critical streaming stack:
-- **`StreamedResponse`**: Leverages Symfony's underlying stream handler to pipe data directly to the client.
-- **PHP Generators**: We use `yield` within our database loops. This ensures that only a single row resides in memory at any given time, allowing us to stream millions of records with O(1) memory complexity.
-- **Buffer Management**: Our controller explicitly executes `ob_end_flush()` and `flush()` after every row. This bypasses the default output buffering, ensuring the frontend receives rows the millisecond they are fetched from the database cursor.
+1. **Lightweight Protocol**: Operates over standard HTTP/2 without the complex handshake or custom server protocols required by WebSockets.
+2. **Automatic Reconnection**: Browsers natively handle network reconnections via `EventSource`.
+3. **Memory Optimization**: PHP Generators (`yield`) stream rows with O(1) memory complexity, making it possible to stream millions of rows without memory spikes.
 
 ---
 
 ## 🤝 Contributing
-Contributions are what make the open-source community an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
 
+Contributions are welcome! Please follow these steps:
 1. Fork the Project
 2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
 3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
@@ -146,6 +159,7 @@ Contributions are what make the open-source community an amazing place to learn,
 ---
 
 ## 👨‍💻 Author
+
 **Chan Min Ko**
 - GitHub: [@chanminko1234](https://github.com/chanminko1234)
 - Twitter: [@chan_min_ko_24](https://x.com/chan_min_ko_24)
@@ -153,6 +167,7 @@ Contributions are what make the open-source community an amazing place to learn,
 ---
 
 ## 📜 License
+
 Distributed under the MIT License. See `LICENSE` for more information.
 
-*Engineered with precision for the next generation of data streaming.*
+*Engineered with precision for high-performance database migrations.*
